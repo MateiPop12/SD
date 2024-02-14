@@ -28,9 +28,7 @@ public class UserController {
     @GetMapping("/findAll")
     public ResponseEntity<Optional<List<UserDto>>> findAll(){
         logger.info("Requested: /user/findAll");
-
         Optional<List<UserDto>> userDtoList = userService.findAll();
-
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userDtoList);
@@ -39,9 +37,7 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserRequestDto userRequestDto) {
         logger.info("Requested: /user/create");
-
         Optional<UserDto> createdUser = userService.create(userRequestDto);
-
         return createdUser.map(dto ->
                         ResponseEntity.status(HttpStatus.CREATED)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -49,13 +45,21 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
-    //TODO: add a check if the user exists or not
+    @PutMapping("/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+        logger.info("Requested: /user/update");
+        Optional<UserDto> updatedUser = userService.update(userDto);
+        return updatedUser.map(dto ->
+                        ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(dto))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         logger.info("Requested: /user/delete");
-
         userService.delete(id);
-
         return ResponseEntity.noContent().build();
     }
 }
